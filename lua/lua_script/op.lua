@@ -46,4 +46,36 @@ function _M.reg(target,value)
 
 end
 
+function _M.ipInRange(target,value)
+
+    if target == nil or value == nil or type(value)~='table' then
+	return false
+    end
+
+    local mask = value['mask']
+    local ipStart = value['ipStart']
+    local ipEnd = value['ipEnd']
+    if bit.band(ipStart,mask)~=bit.band(target,mask) then
+	return false
+    end
+    return (target>=ipStart) and (target<=ipEnd)
+end
+
+function _M.isMatch(target,value,op) 
+   local switch = {
+	    ['eq']=_M.eq,
+	    ['contains']=_M.contains,
+            ['startsWith']=_M.startsWith,
+	    ['endsWith'] = _M.endsWith,
+            ['reg']=_M.reg,
+            ['ipInRange']=_M.ipInRange
+	}
+    local fswitch = switch[op]
+    if fswitch then
+	return fswitch(target,value)
+    else
+	return false
+    end
+end
+
 return _M
