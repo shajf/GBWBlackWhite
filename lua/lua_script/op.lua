@@ -1,4 +1,5 @@
 local _M = {}
+local ip = require "ip"
 
 function _M.eq(target,value)
     return target==value
@@ -48,16 +49,27 @@ end
 
 function _M.ipInRange(target,value)
 
-    if target == nil or value == nil or type(value)~='table' then
-	return false
+    if target == nil or value == nil  then
+        return false
     end
 
-    local mask = value['mask']
-    local ipStart = value['ipStart']
-    local ipEnd = value['ipEnd']
-    if bit.band(ipStart,mask)~=bit.band(target,mask) then
-	return false
+    local pos = string.find(value,":")
+    if pos == nil then
+        return false
     end
+
+
+    local ipStartStr = string.sub(value,1<Plug>PeepOpenos-1)
+    local ipEndStr = string.sub(value<Plug>PeepOpenos+1)
+
+    local ipStart = ip.ipToNumBE(ipStartStr)
+    local ipEnd = ip.ipToNumBE(ipEndStr)
+    local mask = ip.netmaskBE(ipStartStr,ipEndStr) 
+
+    if bit.band(ipStart,mask)~=bit.band(target,mask) then
+        return false
+    end
+    
     return (target>=ipStart) and (target<=ipEnd)
 end
 
@@ -65,17 +77,19 @@ function _M.isMatch(target,value,op)
    local switch = {
 	    ['eq']=_M.eq,
 	    ['contains']=_M.contains,
-            ['startsWith']=_M.startsWith,
+        ['startsWith']=_M.startsWith,
 	    ['endsWith'] = _M.endsWith,
-            ['reg']=_M.reg,
-            ['ipInRange']=_M.ipInRange
+        ['reg']=_M.reg,
+        ['ipInRange']=_M.ipInRange
 	}
+
     local fswitch = switch[op]
     if fswitch then
-	return fswitch(target,value)
+        return fswitch(target,value)
     else
-	return false
+        return false
     end
+
 end
 
 return _M

@@ -307,8 +307,7 @@ static int lua_script_init(gbw_lua_engine_t *lua_engine) {
 gbw_lua_engine_t * gbw_lua_engine_create(gbw_pool_t *mp,const char *lua_path,
         const char *lua_cpath,
         const char *lua_init_fun,
-        const char *lua_black_match_fun,
-        const char *lua_white_match_fun,
+        const char *lua_match_fun,
         const char *lua_fin_fun,
         int is_cache,
         const char *lua_fname,
@@ -322,8 +321,7 @@ gbw_lua_engine_t * gbw_lua_engine_create(gbw_pool_t *mp,const char *lua_path,
     lua_engine->lua_path = lua_path;
     lua_engine->lua_cpath = lua_cpath;
     lua_engine->lua_init_fun = lua_init_fun;
-    lua_engine->lua_black_match_fun = lua_black_match_fun;
-    lua_engine->lua_white_match_fun = lua_white_match_fun;
+    lua_engine->lua_match_fun = lua_match_fun;
     lua_engine->lua_fin_fun = lua_fin_fun;
 
     lua_engine->is_cache = is_cache;
@@ -365,11 +363,11 @@ gbw_lua_engine_t * gbw_lua_engine_create(gbw_pool_t *mp,const char *lua_path,
     return lua_engine;
 }
 
-int gbw_lua_engine_run_black_match(gbw_lua_engine_t *lua_engine,const char *idata_key,void *idata,
+int gbw_lua_engine_run_match(gbw_lua_engine_t *lua_engine,const char *idata_key,void *idata,
         const char *odata_key,void *odata){
 
     /*nothing to do*/
-    if(lua_engine->lua_black_match_fun == NULL)
+    if(lua_engine->lua_match_fun == NULL)
         return 0;
 
     if(idata){
@@ -384,47 +382,16 @@ int gbw_lua_engine_run_black_match(gbw_lua_engine_t *lua_engine,const char *idat
 
 
     /*push run entry function into stack top*/
-    lua_getglobal(lua_engine->lua_state,lua_engine->lua_black_match_fun);
+    lua_getglobal(lua_engine->lua_state,lua_engine->lua_match_fun);
     
     if(gbw_lua_call(lua_engine->lua_state,0,0,0)!=0){
         
-        printf("Run lua script:%s,run fun:%s failed!\n",lua_engine->lua_fname,lua_engine->lua_black_match_fun);
+        printf("Run lua script:%s,run fun:%s failed!\n",lua_engine->lua_fname,lua_engine->lua_match_fun);
         return -1;
     }
 
     return 0;
 }
-
-int gbw_lua_engine_run_white_match(gbw_lua_engine_t *lua_engine,const char *idata_key,void *idata,
-        const char *odata_key,void *odata){
-
-    /*nothing to do*/
-    if(lua_engine->lua_white_match_fun == NULL)
-        return 0;
-
-    if(idata){
-
-        gbw_lua_engine_udata_set(lua_engine,idata_key,idata);
-    }
-    
-    if(odata){
-
-        gbw_lua_engine_udata_set(lua_engine,odata_key,odata);
-    }
-
-
-    /*push run entry function into stack top*/
-    lua_getglobal(lua_engine->lua_state,lua_engine->lua_white_match_fun);
-    
-    if(gbw_lua_call(lua_engine->lua_state,0,0,0)!=0){
-        
-        printf("Run lua script:%s,run fun:%s failed!\n",lua_engine->lua_fname,lua_engine->lua_white_match_fun);
-        return -1;
-    }
-
-    return 0;
-}
-
 
 void gbw_lua_engine_fin(gbw_lua_engine_t *lua_engine){
 

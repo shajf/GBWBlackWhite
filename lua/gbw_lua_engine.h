@@ -36,8 +36,7 @@ struct gbw_lua_engine_t {
     const char *lua_cpath;
 
     const char *lua_init_fun;
-    const char *lua_black_match_fun;
-    const char *lua_white_match_fun;
+    const char *lua_match_fun;
     const char *lua_fin_fun;
 
     int is_cache;
@@ -51,8 +50,7 @@ struct gbw_lua_engine_t {
 extern gbw_lua_engine_t * gbw_lua_engine_create(gbw_pool_t *mp,const char *lua_path,
         const char *lua_cpath,
         const char *lua_init_fun,
-        const char *lua_black_match_fun,
-        const char *lua_white_match_fun,
+        const char *lua_match_fun,
         const char *lua_fin_fun,
         int is_cache,
         const char *lua_fname,
@@ -60,10 +58,7 @@ extern gbw_lua_engine_t * gbw_lua_engine_create(gbw_pool_t *mp,const char *lua_p
         void *data);
 
 
-extern int gbw_lua_engine_run_black_match(gbw_lua_engine_t *engine,const char *idata_key,void *idata,
-        const char *odata_key,void *odata);
-
-extern int gbw_lua_engine_run_white_match(gbw_lua_engine_t *engine,const char *idata_key,void *idata,
+extern int gbw_lua_engine_run_match(gbw_lua_engine_t *engine,const char *idata_key,void *idata,
         const char *odata_key,void *odata);
 
 
